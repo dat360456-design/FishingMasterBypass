@@ -1,9 +1,24 @@
 if not game:IsLoaded() then game.Loaded:Wait() end
 
+
+-- Safe environment checks for mobile executors
+local getgenv = getgenv or function() return _G end
+local getrenv = getrenv or function() return {shared = {}} end
+local gethui = gethui or function() return game:GetService("CoreGui") end
+local isfile = isfile or function(f) return false end
+local readfile = readfile or function(f) return "" end
+local writefile = writefile or function(f, c) end
+local makefolder = makefolder or function(f) end
+local isfolder = isfolder or function(f) return false end
+local request = request or http_request or function(t) return {StatusCode = 400} end
+local fireproximityprompt = fireproximityprompt or function(p) p:InputHoldBegin() task.wait(p.HoldDuration) p:InputHoldEnd() end
+
 local ps = game:GetService("Players")
 repeat task.wait() until ps.LocalPlayer
 
-local lp, rv = ps.LocalPlayer, getrenv().shared
+local re = pcall(getrenv) and getrenv() or {}
+local rv = re.shared or {}
+local lp = ps.LocalPlayer
 while lp:GetAttribute("IsLoaded") ~= true do lp:GetAttributeChangedSignal("IsLoaded"):Wait() end
 repeat task.wait(0.1) until rv.LoadingController and rv.LoadingController:IsLoaded()
 
